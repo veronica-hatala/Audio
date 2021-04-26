@@ -2,71 +2,97 @@ import pyaudio
 import struct #converts strings of bytes to something readable
 import numpy as np
 import matplotlib.pyplot as plt
+import pygame
 
 print("Hey")
 
 #%matplotlib tk
 
-CHUNK = 1024*4 #how many audio sample per frame to display
-FORMAT = pyaudio.paInt16
-CHANNELS = 1 #mono sound
-RATE = 44100 #samples per second
+def main():
+    CHUNK = 1024*4 #how many audio sample per frame to display
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1 #mono sound
+    RATE = 44100 #samples per second
 
-p = pyaudio.PyAudio() # main pyaudio object
+    p = pyaudio.PyAudio() # main pyaudio object
 
-stream = p.open(
-    format = FORMAT,
-    channels = CHANNELS,
-    rate = RATE,
-    input = True,
-    output = True,
-    frames_per_buffer = CHUNK
-)
-
-
-
-fig, ax = plt.subplots()
-
-plt.show(block=False)
-
-x = np.arange(0, 2*CHUNK, 2) #start at 0 to 2*CHUNK, step size is 2
-ax.set_ylim(-255*2, 255*2)
-ax.set_xlim(0, CHUNK)
-
-#create line and update line in a loop
-line, = ax.plot(x, np.random.rand(CHUNK)) #plot some data that has the right length
-
-while True:
-    print("Here again")
-    data = stream.read(CHUNK)
-    #print(data)
-    data_int = np.array(struct.unpack(str(2 * CHUNK)+ 'B', data), dtype='b')[::2] + 128
-    print(np.amax(data_int))
-    #if len(np.where(data_int == 100))>0:
-    #    print("success")
+    stream = p.open(
+        format = FORMAT,
+        channels = CHANNELS,
+        rate = RATE,
+        input = True,
+        output = True,
+        frames_per_buffer = CHUNK
+    )
     
-    count = 0
-    for i in data_int:
-        if i == 255:
-            count = count + 1
-            print("success")
+    x = (display_width*0.5)
+    y = (display_height*0.5)
+    y_change = 0 
     
-    #updates the plot
-    line.set_ydata(data_int)
     
-    try: 
-        fig.canvas.draw()
-        fig.canvas.flush_events()
+    gameExit = False
+
+    while not gameExit:
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()    
+    
+
+    
+
+        #print("----------")
+        data = stream.read(CHUNK)
+        #print(data)
+        data_int = np.array(struct.unpack(str(2 * CHUNK)+ 'B', data), dtype='b')[::2] + 128
         
-    except:
-        print("Error")
-        break
+        if 255 in data_int:
+            y_change = -5
+        else:
+            y_change = 5
+                
+        y += y_change
+        
+        gameDisplay.fill(white)
+        
+        balloon(x, y)
+        
+        
+        
+        pygame.display.update()
+        clock.tick(60)
+        
+        y_change = 0
 
-#ax.plot(data_int, '-')
-#plt.show()
+pygame.init()
 
+pygame.display.set_caption("Balloon")
 
+display_width = 600
+display_height = 800
 
+# Colour definitions
+black = (0, 0, 0)
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+
+gameDisplay = pygame.display.set_mode(
+    (display_width, display_height))
+    
+clock = pygame.time.Clock()
+
+balloonImg = pygame.image.load("balloonImg.png")
+balloon_width = 49
+balloon_height = 103
+
+def balloon(x, y):
+    gameDisplay.blit(balloonImg, (x, y))
+
+main()       
+pygame.quit()
+quit()
 
 
 

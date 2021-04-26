@@ -1,7 +1,13 @@
 import pygame
+import audio
 
 print("Hey there, in visuals py")
+print("There isn't anything here yet.")
 
+
+
+#we'll deal with this stuff later
+'''
 pygame.init()
 
 pygame.display.set_caption("Balloon")
@@ -64,7 +70,7 @@ def main_game():
 main_game()
 pygame.quit()
 quit()
-        
+ '''     
     
     
     
